@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\Messenger\Command\RowsBuilder\RowsBuilder;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -37,11 +38,13 @@ abstract class AbstractFailedMessagesCommand extends Command
 {
     private $receiverName;
     private $receiver;
+    private $rowsBuilder;
 
-    public function __construct(string $receiverName, ReceiverInterface $receiver)
+    public function __construct(string $receiverName, ReceiverInterface $receiver, RowsBuilder $rowsBuilder)
     {
         $this->receiverName = $receiverName;
         $this->receiver = $receiver;
+        $this->rowsBuilder = $rowsBuilder;
 
         parent::__construct();
     }
@@ -74,9 +77,8 @@ abstract class AbstractFailedMessagesCommand extends Command
         $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
         $lastRedeliveryStampWithException = $this->getLastRedeliveryStampWithException($envelope, true);
 
-        $rows = [
-            ['Class', \get_class($envelope->getMessage())],
-        ];
+        $rows = $this->rowsBuilder->build($envelope);
+        $rows[] = ['gabrys', 'Fi'];
 
         if (null !== $id = $this->getMessageId($envelope)) {
             $rows[] = ['Message Id', $id];

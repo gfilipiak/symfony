@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Command\RowsBuilder\Row\ClassRow;
+use Symfony\Component\Messenger\Command\RowsBuilder\RowsBuilder;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -191,5 +193,9 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('message bus locator'),
                 service('messenger.default_bus'),
             ])
+        ->set('messenger.rows_builder.class', ClassRow::class)
+            ->tag('messenger.rows_builder.row')
+        ->set('messenger.rows_builder', RowsBuilder::class)
+            ->args([tagged_iterator('messenger.rows_builder.row')])
     ;
 };

@@ -167,6 +167,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Receiver name'),
                 abstract_arg('Receiver'),
+                service('messenger.rows_builder'),
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
                 service('logger'),
